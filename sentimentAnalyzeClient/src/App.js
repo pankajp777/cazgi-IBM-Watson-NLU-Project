@@ -35,21 +35,24 @@ class App extends React.Component {
       sentimentOutput:[],
       sentiment:true
       });
+
+
+
+
   } 
   
   sendForSentimentAnalysis = () => {
     this.setState({sentiment:true});
-    let url = ".";
-    let mode = this.state.mode
-    url = url+"/" + mode + "/sentiment?"+ mode + "="+document.getElementById("textinput").value;
-
-    fetch(url).then((response)=>{
+    let url = "http://localhost:8000";
+   let mode = this.state.mode
+    url = url+"/" + mode + "/sentiment?"+ mode+"="+document.getElementById("textinput").value;
+      fetch(url).then((response)=>{
         response.json().then((data)=>{
         this.setState({sentimentOutput:data.label});
         let output = data.label;
         let color = "white"
         switch(output) {
-          case "green": color = "positive";break;
+          case "positive": color = "green";break;
           case "neutral": color = "yellow";break;
           case "negative": color = "red";break;
           default: color = "black";
@@ -60,17 +63,21 @@ class App extends React.Component {
   }
 
   sendForEmotionAnalysis = () => {
-
+    
     this.setState({sentiment:false});
-    let url = ".";
+    let url = "http://localhost:8000"
     let mode = this.state.mode
-    url = url+"/" + mode + "/emotion?"+ mode + "="+document.getElementById("textinput").value;
+  url = url+"/" + mode + "/emotion?"+ mode +"="+document.getElementById("textinput").value;
+
 
     fetch(url).then((response)=>{
       response.json().then((data)=>{
+        console.log(data)
       this.setState({sentimentOutput:<EmotionTable emotions={data}/>});
   })})  ;
   }
+
+  
   
 
   render() {
@@ -83,6 +90,7 @@ class App extends React.Component {
         <br/>
         <button className="btn-primary" onClick={this.sendForSentimentAnalysis}>Analyze Sentiment</button>
         <button className="btn-primary" onClick={this.sendForEmotionAnalysis}>Analyze Emotion</button>
+    
         <br/>
             {this.state.sentimentOutput}
       </div>

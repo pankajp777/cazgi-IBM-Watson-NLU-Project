@@ -1,21 +1,24 @@
 const express = require('express');
+const querystring = require('querystring');
+var url = require('url');
 const app = new express();
 
 app.set('view engine', 'html');
 
 /*This tells the server to use the client 
 folder for all static resources*/
-app.use(express.static('client//build'));
+app.use(express.static('client'));
 
 /*This tells the server to allow cross origin references*/
 const cors_app = require('cors');
+const { name } = require('ejs');
 app.use(cors_app());
 
 /*Uncomment the following lines to loan the environment 
 variables that you set up in the .env file*/
 
-// const dotenv = require('dotenv');
-// dotenv.config();
+const dotenv = require('dotenv');
+ dotenv.config();
 
  const api_key = process.env.API_KEY;
  const api_url = process.env.API_URL;
@@ -35,25 +38,26 @@ function getNLUInstance() {
 }
 
 
-//The default endpoint for the webserver
-app.get("/",(req,res)=>{
-    res.render('index.html');
-  });
 
 //The endpoint for the webserver ending with /url/emotion
 app.get("/url/emotion", (req,res) => {
-    app.get("/url/emotion", (req,res) => {
-        let urlToAnalyze = req.query.url
-        const analyzeParams = 
-        {
-            "url": urlToAnalyze,
-            "features": {
-                "keywords": {
-                    "emotion": true,
-                    "limit": 1
-                }
-            }
-        }
+
+
+  let textToAnalyze = req.query.url
+  const analyzeParams = { 'text': textToAnalyze,
+  'features': {
+    'entities': {
+      'emotion': true,
+      'sentiment': true,
+      'limit': 2,
+    },
+    'keywords': {
+      'emotion': true,
+      'sentiment': true,
+      'limit': 1
+    },
+  },
+};
 
         const naturalLanguageUnderstanding = getNLUInstance();
 
@@ -66,28 +70,33 @@ app.get("/url/emotion", (req,res) => {
             return res.send("Could not do desired operation "+err);
         });
     });
-});
+
+
 
 //The endpoint for the webserver ending with /url/sentiment
 app.get("/url/sentiment", (req,res) => {
-    app.get("/url/sentiment", (req,res) => {
-        let urlToAnalyze = req.query.url
-        const analyzeParams = 
-        {
-            "url": urlToAnalyze,
-            "features": {
-                "keywords": {
-                    "sentiment": true,
-                    "limit": 1
-                }
-            }
-        }
-
+   
+   
+  let textToAnalyze = req.query.url
+  const analyzeParams = { 'text': textToAnalyze,
+  'features': {
+    'entities': {
+      'emotion': true,
+      'sentiment': true,
+      'limit': 2,
+    },
+    'keywords': {
+      'emotion': true,
+      'sentiment': true,
+      'limit': 1
+    },
+  },
+};
         const naturalLanguageUnderstanding = getNLUInstance();
 
         naturalLanguageUnderstanding.analyze(analyzeParams)
         .then(analysisResults => {
-            //Retrieve the sentiment and return it as a formatted string
+            //Retrieve the sentiment and return it as a formatted string  
 
             return res.send(analysisResults.result.keywords[0].sentiment,null,2);
         })
@@ -95,11 +104,11 @@ app.get("/url/sentiment", (req,res) => {
             return res.send("Could not do desired operation "+err);
         });
     });
-});
 
 //The endpoint for the webserver ending with /text/emotion
 app.get("/text/emotion", (req,res) => {
-    app.get("/text/emotion", (req,res) => {
+  
+        
         let textToAnalyze = req.query.text
         const analyzeParams = 
         {
@@ -110,35 +119,42 @@ app.get("/text/emotion", (req,res) => {
                     "limit": 1
                 }
             }
-        }
+        } 
 
         const naturalLanguageUnderstanding = getNLUInstance();
 
         naturalLanguageUnderstanding.analyze(analyzeParams)
         .then(analysisResults => {
-            //Retrieve the emotion and return it as a formatted string
+            //Retrieve the sentiment and return it as a formatted string
 
             return res.send(analysisResults.result.keywords[0].emotion,null,2);
         })
         .catch(err => {
             return res.send("Could not do desired operation "+err);
         });
+
+
+
     });
-});
+
+
 
 app.get("/text/sentiment", (req,res) => {
-    app.get("/text/sentiment", (req,res) => {
-        let textToAnalyze = req.query.text
-        const analyzeParams = 
-        {
-            "text": textToAnalyze,
-            "features": {
-                "keywords": {
-                    "sentiment": true,
-                    "limit": 1
-                }
-            }
-        }
+  
+    
+      let textToAnalyze = req.query.text
+      const analyzeParams = 
+      {
+          "text": textToAnalyze,
+          "features": {
+              "keywords": {
+                  "sentiment": true,
+                  "limit": 1
+              }
+          }
+      } 
+
+
 
         const naturalLanguageUnderstanding = getNLUInstance();
 
@@ -151,9 +167,11 @@ app.get("/text/sentiment", (req,res) => {
         .catch(err => {
             return res.send("Could not do desired operation "+err);
         });
-    });});
 
-let server = app.listen(8080, () => {
+
+
+    });
+
+let server = app.listen(7000, () => {
     console.log('Listening', server.address().port)
 })
-
