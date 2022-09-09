@@ -172,6 +172,6 @@ app.get("/text/sentiment", (req,res) => {
 
     });
 
-let server = app.listen(7000, () => {
+let server = app.listen(8000, () => {
     console.log('Listening', server.address().port)
 })
